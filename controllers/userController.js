@@ -33,7 +33,11 @@ async function getUsers(req, res) {
         }
 
         if (active !== undefined) {
-            query.active = active === 'true';
+            if(active === 'true'){
+                query.active = true
+            } else if(active === 'false'){
+                query.active = false;
+            }
         }
 
         console.log(query);
@@ -50,11 +54,7 @@ async function getUsers(req, res) {
             sortOptions['created_at'] = 1;
         }
 
-        const users = await User.find(query)
-            .sort(sortOptions)
-            .skip(options.skip)
-            .limit(options.limit);
-
+        const users = await User.find(query).sort(sortOptions).skip(options.skip).limit(options.limit);
         res.status(200).json({
             body: users,
         });
