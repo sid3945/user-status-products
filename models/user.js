@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    role: {type: String, required: true, enum: ["admin", "customer", "employee"]},
+    role: {type: String, required: true, enum: ["admin", "customer", "employee"], default: "customer"},
     active: {type: Boolean, required: true},
     email: {type: String, required: true, unique: true},
     created_at: {type: Date, required: true, default: Date.now },
