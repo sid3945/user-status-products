@@ -1,5 +1,18 @@
 const User = require('../models/user');
 
+async function createUser(req, res){
+    try {
+        const {role, active, email, name, id} = req.body;
+        const user = new User({role, active, email, name, id});
+        const resUser = await user.save();
+        console.log(resUser);
+        res.status(201).json({body: resUser});
+    } catch (error){
+        console.error("Failed to create user ", error);
+        res.status(500).json({message: "Internal Server Failure"});
+    }
+};
+
 async function getUsers(req, res) {
     try {
         const {
@@ -11,6 +24,8 @@ async function getUsers(req, res) {
             order = 'asc'
         } = req.query;
 
+        console.log(active);
+
         const query = {};
 
         if (role) {
@@ -21,6 +36,8 @@ async function getUsers(req, res) {
             query.active = active === 'true';
         }
 
+        console.log(query);
+
         const options = {
             skip: (parseInt(page, 10) - 1) * parseInt(limit, 10),
             limit: parseInt(limit, 10)
@@ -30,7 +47,7 @@ async function getUsers(req, res) {
         if (sort === 'name' || sort === 'created_at') {
             sortOptions[sort] = order === 'asc' ? 1 : -1;
         } else {
-            sortOptions['created_at'] = 1; // Default sorting
+            sortOptions['created_at'] = 1;
         }
 
         const users = await User.find(query)
@@ -38,14 +55,8 @@ async function getUsers(req, res) {
             .skip(options.skip)
             .limit(options.limit);
 
-        const totalUsers = await User.countDocuments(query);
-
         res.status(200).json({
             body: users,
-            totalDocs: totalUsers,
-            totalPages: Math.ceil(totalUsers / options.limit),
-            page: parseInt(page, 10),
-            limit: parseInt(limit, 10)
         });
     } catch (error) {
         console.error(error);
@@ -53,4 +64,4 @@ async function getUsers(req, res) {
     }
 }
 
-module.exports =  getUsers ;
+module.exports = {getUsers,createUser};
